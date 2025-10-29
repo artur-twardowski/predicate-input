@@ -106,7 +106,6 @@ class PredicateInput:
                 if item not in syntax_tree_ptr:
                     syntax_tree_ptr[item] = {}
                 syntax_tree_ptr = syntax_tree_ptr[item]
-        print(self._syntax_tree)
 
     def begin(self):
         return PredicateInput.Iterator(self)
