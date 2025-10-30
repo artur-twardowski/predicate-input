@@ -17,7 +17,6 @@ class PredicateInput:
                 else:
                     raise RuntimeError("Unknown argument: %s" % arg_name)
 
-
         def call(self, args, current_input):
             n_args = len(args)
             if n_args in self.callbacks:
@@ -25,10 +24,15 @@ class PredicateInput:
             else:
                 raise RuntimeError("Missing callback for <%s> that takes %d argument%s" % (current_input, n_args, "" if n_args == 1 else "s"))
 
-
-    class Parameter:
-        def __init__(self, items: frozenset):
+    class TokenClass:
+        def __init__(self, items: frozenset, placeholder=None):
             self.items = items
+            self.placeholder = placeholder
+            if placeholder is None:
+                placeholder = "[" + "".join(sorted(items)) + "]"
+        
+        def __str__(self):
+            return self.placeholder
 
     class Iterator:
         def __init__(self, parent):
@@ -89,11 +93,11 @@ class PredicateInput:
         for ix in range(0, len(sequence)):
             item = sequence[ix]
             last_item = (ix == len(sequence) - 1)
-            assert isinstance(item, (str, PredicateInput.Parameter)), \
+            assert isinstance(item, (str, PredicateInput.TokenClass)), \
                 "Each element of sequence must be either a string or a Parameter" 
 
             current_predicate += str(item)
-            if isinstance(item, PredicateInput.Parameter):
+            if isinstance(item, PredicateInput.TokenClass):
                 item = item.items
 
             if item in syntax_tree_ptr:

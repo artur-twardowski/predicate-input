@@ -2,21 +2,16 @@ import pytest
 from predicate_input import PredicateInput
 
 
-class Digits(PredicateInput.Parameter):
+class Digits(PredicateInput.TokenClass):
     def __init__(self):
-        super().__init__(frozenset({'0', '1', '2', '3', '4', '5', '6', '7', '8' ,'9'}))
-
-    def __str__(self):
-        return "<Digits>"
+        super().__init__(frozenset({'0', '1', '2', '3', '4', '5', '6', '7', '8' ,'9'}),
+                         placeholder="<Digits>")
 
 
-class AlphaNum(PredicateInput.Parameter):
+class AlphaNum(PredicateInput.TokenClass):
     def __init__(self):
         alnum = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        super().__init__(frozenset([ch for ch in alnum]))
-
-    def __str__(self):
-        return "<AlphaNum>"
+        super().__init__(frozenset([ch for ch in alnum]), placeholder="<AlphaNum>")
 
 
 class CallbackMock:
