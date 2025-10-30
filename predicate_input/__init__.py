@@ -78,6 +78,9 @@ class PredicateInput:
 
             self.reset()
             return False
+        
+        def get_current_input(self):
+            return self._current_input
 
 
     def __init__(self):
