@@ -28,11 +28,15 @@ class PredicateInput:
         def __init__(self, items: frozenset, placeholder=None):
             self.items = items
             self.placeholder = placeholder
+            self.raw_placeholder = "[" + "".join(sorted(items)) + "]"
             if placeholder is None:
-                placeholder = "[" + "".join(sorted(items)) + "]"
+                placeholder = self.raw_placeholder
         
         def __str__(self):
             return self.placeholder
+
+        def __repr__(self):
+            return self.raw_placeholder
 
     class Iterator:
         def __init__(self, parent):
@@ -50,14 +54,15 @@ class PredicateInput:
             self._current_input += data
 
             for next_steps, action in self._syntax_tree_ptr.items():
+                if isinstance(next_steps, frozenset) and not self._continuing_param:
+                    self._arguments.append("")
+
+            for next_steps, action in self._syntax_tree_ptr.items():
                 hit = False
                 if isinstance(next_steps, frozenset):
                     if data in next_steps:
                         hit = True
-                        if self._continuing_param:
-                            self._arguments[-1] += data
-                        else:
-                            self._arguments.append(data)
+                        self._arguments[-1] += data
                 else:
                     hit = (data == next_steps)
 
@@ -104,8 +109,9 @@ class PredicateInput:
                 item = item.items
 
             if item in syntax_tree_ptr:
-                assert isinstance(syntax_tree_ptr[item], dict), \
-                    "Already an action taken at <%s>, cannot be a predicate for another action" % current_predicate
+                assert isinstance(syntax_tree_ptr[item], dict) or syntax_tree_ptr[item] == PredicateInput.Continue, \
+                    "Already an action taken at <%s> (%s), cannot be a predicate for another action" % (
+                            current_predicate, syntax_tree_ptr[item])
 
             if last_item:
                 syntax_tree_ptr[item] = action

@@ -70,18 +70,15 @@ def common_syntax():
         "TXXb": CallbackMock()  # command that takes multiple arguments, terminated with a semicolon
     }
 
+    pi.register([Digits()], action=PredicateInput.Continue)
     pi.register(['a'], action=PredicateInput.Action(
-        callback0=lambda: callbacks['a'](),
         callback1=lambda c: callbacks['a'](c)
     ))
-    pi.register([Digits()], action=PredicateInput.Continue)
     pi.register(['t', AlphaNum(), 'b'], action=PredicateInput.Action(
-        callback1=lambda x: callbacks['tXb'](x),
         callback2=lambda c, x: callbacks['tXb'](c, x)
     ))
     pi.register(['T', AlphaNum()], action=PredicateInput.Continue)
     pi.register(['T', ';', 'b'], action=PredicateInput.Action(
-        callback1=lambda xs: callbacks['TXXb'](xs),
         callback2=lambda c, xs: callbacks['TXXb'](c, xs),
     ))
 
@@ -95,7 +92,7 @@ def test_call_without_arguments(common_syntax):
 
     assert it.push('a') is True
     assert callbacks['a'].times_called == 1
-    assert len(callbacks['a'].args) == 0
+    assert callbacks['a'].args == ('',)
 
 
 def test_call_with_counter(common_syntax):
@@ -123,7 +120,7 @@ def test_call_with_argument(common_syntax):
 
     assert it.push('b') is True
     assert callbacks['tXb'].times_called == 1
-    assert callbacks['tXb'].args == ('a', )
+    assert callbacks['tXb'].args == ('', 'a')
 
 
 def test_call_with_counter_and_argument(common_syntax):
@@ -153,6 +150,6 @@ def test_call_with_repeated_argument(common_syntax):
 
     assert it.push('b') is True
     assert callbacks['TXXb'].times_called == 1
-    assert callbacks['TXXb'].args == ('xyz', )
+    assert callbacks['TXXb'].args == ('', 'xyz')
 
 
